@@ -21,7 +21,7 @@ public class MainControl : MonoBehaviour
 	public float minVelocity;
 	public float maxVelocity;
 	public int maxBallNumber;
-	public float minRadius;
+	public float minScale;
 
 	enum GameState
 	{
@@ -289,16 +289,14 @@ public class MainControl : MonoBehaviour
 
 	void Shrink()
 	{
-		// border shrink
-		float radius = border.GetComponent<BorderControl>().GetComponent<Animator>().GetFloat("scale");
-		if (radius < minRadius)
-		{
-			GameOver();
-		}
-
 		// sign animation
 		sign.GetComponent<SignControl>().Shrink();
 		border.GetComponent<BorderControl>().Shrink();
+
+        if (border.transform.localScale.x - minScale < 1e-5)
+        {
+            GameOver();
+        }
 			
 		Vector2 signPos = new Vector2(sign.transform.position.x, sign.transform.position.y);
 
@@ -422,21 +420,14 @@ public class MainControl : MonoBehaviour
 					pos0.y += 0.3f;
 					pos1.y -= 0.3f;
 				}
-
+                
 				SpawnNewBall(type + 1, 1 - ball.GetComponent<BallControl>().color, pos0, v0);
 				SpawnNewBall(type + 1, 1 - ball.GetComponent<BallControl>().color, pos1, v1);
 
 				balls.Remove(ball);
 				Destroy(ball);
 			}
-			else
-			{
-				ball.GetComponent<BallControl>().FlipColor();
-			}
-			/*
-			print (v.x);
-			print (v.y);
-			*/
+
 			//print(lastBouncerIndex);
 		}
 			

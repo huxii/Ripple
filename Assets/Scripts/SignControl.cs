@@ -17,7 +17,7 @@ public class SignControl : MonoBehaviour
 		manager = GameObject.Find ("GameManager");
 		animator = GetComponent<Animator>();
 
-		int spriteIndex = 0;
+		spriteIndex = 0;
 		spriteRenderer = GetComponent<SpriteRenderer>();
 	}
 

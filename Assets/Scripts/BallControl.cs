@@ -1,14 +1,15 @@
 ﻿using UnityEngine;
 using System.Collections;
+using DG.Tweening;
 
 public class BallControl : MonoBehaviour 
 {
 
-	//public variables are accessible by other scripts, and are often set in the inspector
-	//they're great for tunable variables, like these, since we can edit them in play mode.
-	//public float horizontalSpeed; //the ball's constant horizontal speed
-	//public float maxVerticalSpeed; //the maximum vertical speed
-
+    //public variables are accessible by other scripts, and are often set in the inspector
+    //they're great for tunable variables, like these, since we can edit them in play mode.
+    //public float horizontalSpeed; //the ball's constant horizontal speed
+    //public float maxVerticalSpeed; //the maximum vertical speed
+    public Sprite[] sprites;
 	public int type;
 	public int color;
 	public int timer;
@@ -17,8 +18,8 @@ public class BallControl : MonoBehaviour
 	//they can't be accessed by other scripts
 	Rigidbody2D rb; //a reference to the Rigidbody2D component on this object
 	GameObject manager;
-	Animator animator;
-
+    Animator animator;
+    SpriteRenderer spriteRenderer;
 	int spriteIndex;
 	float initSpeed;
 	float ballSpeedRate;
@@ -29,9 +30,10 @@ public class BallControl : MonoBehaviour
 	{
 		manager = GameObject.Find ("GameManager");
 		rb = GetComponent<Rigidbody2D>();
-		animator = GetComponent<Animator>();
+        animator = GetComponent<Animator>();
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
-		spriteIndex = 0;
+        spriteIndex = 0;
 		delayTime = 5;
 		initSpeed = 3.5f;
 		ballSpeedRate = 1.0f;
@@ -67,28 +69,16 @@ public class BallControl : MonoBehaviour
 		if (thisCollision.collider.tag == "Wall")
 		{
 			manager.SendMessage("BallHitBorder", this.gameObject);
+            animator.SetTrigger("Hit");
 
-			if (color == 0)
-			{
-				animator.Play("Bounce1", 0);
-			}
-			else
-			{
-				animator.Play("Bounce0", 0);
-			}
+            FlipColor();
 		}
-		else
-		{		
-			if (color == 0)
-			{
-				animator.Play("Bounce0", 0);
-			}
-			else
-			{
-				animator.Play("Bounce1", 0);
-			}
-		}
-	}
+        else
+        if (thisCollision.collider.tag == "Player")
+        {
+            animator.SetTrigger("Hit");
+        }
+    }
 
 	void OnTriggerEnter2D(Collider2D other)
 	{
@@ -109,6 +99,7 @@ public class BallControl : MonoBehaviour
 		type = _type;
 		color = _colorIndex;
 
+        /*
 		if (color == 0)
 		{
 			GetComponent<Animator>().Play("Spawn0", 0);
@@ -117,6 +108,7 @@ public class BallControl : MonoBehaviour
 		{
 			GetComponent<Animator>().Play("Spawn0", 0);
 		}
+        */
 	}
 
 	public void collideDelay()
@@ -127,8 +119,8 @@ public class BallControl : MonoBehaviour
 	public void FlipColor()
 	{
 		color = 1 - color;
-		animator.SetInteger("color", color);
-		//spriteRenderer.sprite = sprites[color];
+		//animator.SetInteger("color", color);
+		spriteRenderer.sprite = sprites[color];
 	}
 
 	public void SetPos(Vector2 pos)

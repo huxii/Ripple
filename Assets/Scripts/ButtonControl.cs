@@ -29,8 +29,8 @@ public class ButtonControl : MonoBehaviour
 	{
         if (interactable)
         {
-            transform.DOScale(new Vector3(1f, 1f, 1f), 1f);
-            logo.transform.DOScale(new Vector3(1f, 1f, 1f), 1f);
+            transform.DOScale(new Vector3(1f, 1f, 1f), 1f).SetEase(Ease.InOutCubic);
+            logo.transform.DOScale(new Vector3(1f, 1f, 1f), 0.7f).SetEase(Ease.InOutCubic);
         }
     }
 
@@ -38,8 +38,8 @@ public class ButtonControl : MonoBehaviour
 	{
         if (interactable)
         {
-            transform.DOScale(new Vector3(0.8f, 0.8f, 0.8f), 1f);
-            logo.transform.DOScale(new Vector3(0f, 0f, 0f), 1f);
+            transform.DOScale(new Vector3(0.8f, 0.8f, 0.8f), 1f).SetEase(Ease.InOutCubic);
+            logo.transform.DOScale(new Vector3(0f, 0f, 0f), 0.7f).SetEase(Ease.InOutCubic);
         }
     }
 
