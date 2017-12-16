@@ -2,48 +2,61 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using DG.Tweening;
 
 public class ButtonControl : MonoBehaviour
 {
 	public GameObject logo;
 
-	Animator animator;
+    MenuControl menuManager;
+    bool interactable;
 
 	// Use this for initialization
 	void Start()
 	{
-		animator = GetComponent<Animator>();
-	}
+        menuManager = GameObject.FindGameObjectWithTag("Manager").GetComponent<MenuControl>();
+        transform.DOScale(new Vector3(0.8f, 0.8f, 0.8f), 0f);
+        logo.transform.DOScale(new Vector3(0f, 0f, 0f), 0f);
+        interactable = true;
+    }
 	
 	// Update is called once per frame
 	void Update()
 	{
-		if (animator.GetCurrentAnimatorStateInfo(0).IsName("Hover"))
-		{
-			print("**********");
-			if (animator.GetCurrentAnimatorStateInfo(0).normalizedTime >= 0.99f)
-			{
-				SceneManager.LoadScene("GameScene");
-			}
-		}
 	}
 
 	void OnMouseEnter()
 	{
-		animator.SetBool("mouseOver", true);
-		logo.GetComponent<LogoControl>().hover();
-	}
+        if (interactable)
+        {
+            transform.DOScale(new Vector3(1f, 1f, 1f), 1f);
+            logo.transform.DOScale(new Vector3(1f, 1f, 1f), 1f);
+        }
+    }
 
 	void OnMouseExit()
 	{
-		animator.SetBool("mouseOver", false);
-		logo.GetComponent<LogoControl>().unhover();
-	}
+        if (interactable)
+        {
+            transform.DOScale(new Vector3(0.8f, 0.8f, 0.8f), 1f);
+            logo.transform.DOScale(new Vector3(0f, 0f, 0f), 1f);
+        }
+    }
 
 	void OnMouseDown()
 	{
-		animator.SetBool("mouseOver", false);
-		logo.GetComponent<LogoControl>().click();
-		Destroy(gameObject);
+        if (interactable)
+        {
+            interactable = false;
+            logo.GetComponent<Animator>().SetTrigger("Clicked");
+            GetComponent<SpriteRenderer>().enabled = false;
+            StartCoroutine(DelayToLoad(1, 1.1f));
+        }
 	}
+
+    IEnumerator DelayToLoad(int num, float delay)
+    {
+        yield return new WaitForSeconds(delay);
+        menuManager.Load(1);
+    }
 }

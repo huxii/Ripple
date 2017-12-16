@@ -9,7 +9,6 @@ public class MainControl : MonoBehaviour
 	public List<GameObject> ballPrefabs;
 	public List<GameObject> ripplePrefabs;
 	public List<GameObject> popPrefabs;
-	public GameObject loadingBgPrefab;
 
 	public GameObject border;
 	public GameObject bg;
@@ -34,7 +33,7 @@ public class MainControl : MonoBehaviour
 	};
 
 	GameState gameState;
-
+    LoadingControl loader;
 	GameObject bgm;
 	List<GameObject> balls;
 	int lastBouncerIndex;
@@ -44,15 +43,16 @@ public class MainControl : MonoBehaviour
 	int score;
 	int timer;
 	int curMaxBallNumber;
-	int stateTimer;
+    int stateTimer;
 
 	// Use this for initialization
 	void Start()
 	{
-		FadeIn();
+        loader = GameObject.FindGameObjectWithTag("Loader").GetComponent<LoadingControl>();
+        loader.FadeIn(3f);
 
 		bgm = GameObject.Find("BGM");
-		if (bgm.GetComponent<BGMControl>().count > 0)
+		if (bgm && bgm.GetComponent<BGMControl>().count > 0)
 		{
 			curMaxBallNumber = maxBallNumber;
 			gameState = GameState.Game;
@@ -63,7 +63,7 @@ public class MainControl : MonoBehaviour
 			gameState = GameState.Rotation;
 		}
 
-		Init();
+        Init();
 	}
 	
 	// Update is called once per frame
@@ -257,26 +257,7 @@ public class MainControl : MonoBehaviour
 		print("over");
 		gameState = GameState.Over;
 
-		FadeOut(0.2f);
-	}
-
-	void FadedOut()
-	{
-		SceneManager.LoadScene("StartScene");
-	}
-
-	void FadeIn(float speed = 1.0f)
-	{
-		GameObject bg = Instantiate(loadingBgPrefab, new Vector3(0.0f, 0.0f, 10.0f), Quaternion.identity) as GameObject;
-		bg.GetComponent<FadingControl>().fadingDir = -1;		
-		bg.GetComponent<FadingControl>().fadingSpeed = speed;
-	}
-
-	void FadeOut(float speed = 1.0f)
-	{
-		GameObject bg = Instantiate(loadingBgPrefab, new Vector3(0.0f, 0.0f, 10.0f), Quaternion.identity) as GameObject;
-		bg.GetComponent<FadingControl>().fadingDir = 1;		
-		bg.GetComponent<FadingControl>().fadingSpeed = speed;
+        loader.Load(0, 3f);
 	}
 
 	void SpawnNewBall(int type, int colorIndex, Vector3 pos, Vector2 v)

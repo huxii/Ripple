@@ -8,6 +8,8 @@ TagManager:
   - Sign
   - Wall
   - BGM
+  - Manager
+  - Loader
   layers:
   - Default
   - TransparentFX
@@ -50,6 +52,9 @@ TagManager:
     locked: 0
   - name: Assets
     uniqueID: 612347639
+    locked: 0
+  - name: UI
+    uniqueID: 3036308865
     locked: 0
   - name: Loading
     uniqueID: 3565188803
