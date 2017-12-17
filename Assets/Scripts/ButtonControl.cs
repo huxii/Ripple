@@ -7,6 +7,7 @@ using DG.Tweening;
 public class ButtonControl : MonoBehaviour
 {
 	public GameObject logo;
+    public GameObject[] ripplePrefabs;
 
     MenuControl menuManager;
     bool interactable;
@@ -31,6 +32,10 @@ public class ButtonControl : MonoBehaviour
         {
             transform.DOScale(new Vector3(1f, 1f, 1f), 1f).SetEase(Ease.InOutCubic);
             logo.transform.DOScale(new Vector3(1f, 1f, 1f), 0.7f).SetEase(Ease.InOutCubic);
+
+            int idx = Random.Range(0, 2);
+            GameObject ripple = Instantiate(ripplePrefabs[idx], transform);
+            ripple.transform.localScale = new Vector3(2.5f, 2.5f, 2.5f);
         }
     }
 

@@ -84,7 +84,7 @@ public class MainControl : MonoBehaviour
 			++stateTimer;
 			instruction.text = "Move mouse to rotate the central circle";
 			hint.text = "Balls (have a maximum number) split and flip color after hitting the wall.";
-			print(Input.GetAxis("Mouse X"));
+			//print(Input.GetAxis("Mouse X"));
 			if (Input.GetAxis("Mouse X") != 0.0f || Input.GetAxis("Mouse Y") != 0.0f)
 			{
 				if (stateTimer >= 10)
@@ -207,7 +207,7 @@ public class MainControl : MonoBehaviour
 		else
 		{
 			SetBallSpeedRate(0.05f);
-			border.GetComponent<BorderControl>().SetSpeedRate(0.1f);
+			border.GetComponent<BorderControl>().SetSpeedRate(0.5f);
 		}
 
 		if (timer < 990)
@@ -271,17 +271,13 @@ public class MainControl : MonoBehaviour
 	{
 		if (thisScore > 0)
 		{
-			// pop animation
-			float radius = border.GetComponent<BorderControl>().GetComponent<Animator>().GetFloat("scale");
-			GameObject pop = Instantiate(popPrefabs[0], defaultSpawnPos, Quaternion.identity) as GameObject;
-			pop.GetComponent<PopControl>().Init(radius);
-		}
+            // pop animation
+            GameObject pop = Instantiate(popPrefabs[0], border.transform) as GameObject;
+        }
 		else
 		{	// pop animation
-			float radius = border.GetComponent<BorderControl>().GetComponent<Animator>().GetFloat("scale");
-			GameObject pop = Instantiate(popPrefabs[1], defaultSpawnPos, Quaternion.identity) as GameObject;
-			pop.GetComponent<PopControl>().Init(radius);
-		}
+            GameObject pop = Instantiate(popPrefabs[1], border.transform) as GameObject;
+        }
 
 		score += thisScore;
 		scoreText.text = score.ToString();

@@ -24,7 +24,6 @@ public class SignControl : MonoBehaviour
 	// Update is called once per frame
 	void Update () 
 	{
-		animator.SetInteger("hit", 0);
 	}
 
 	/*
@@ -46,12 +45,12 @@ public class SignControl : MonoBehaviour
 
 	public void Shrink()
 	{
-		animator.SetInteger("hit", 1);
+		//animator.SetInteger("hit", 1);
 	}
 
 	public void Expand()
 	{
-		animator.SetInteger("hit", 2);
+		//animator.SetInteger("hit", 2);
 	}
 }
 

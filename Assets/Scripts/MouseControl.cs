@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class MouseControl : MonoBehaviour 
 {
@@ -44,6 +45,7 @@ public class MouseControl : MonoBehaviour
 			}
 		}
 
-		this.transform.eulerAngles = new Vector3(0, 0, angle);
-	}
+        transform.DORotate(new Vector3(0, 0, angle), 0.8f);
+		//this.transform.eulerAngles = new Vector3(0, 0, angle);
+    }
 }

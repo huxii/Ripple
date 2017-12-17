@@ -696,6 +696,11 @@ Prefab:
   m_Modification:
     m_TransformParent: {fileID: 1819844942}
     m_Modifications:
+    - target: {fileID: 114415616533556410, guid: 18be9d8304c95414ca359d3ba10cc6ad,
+        type: 2}
+      propertyPath: ripplePrefabs.Array.size
+      value: 2
+      objectReference: {fileID: 0}
     - target: {fileID: 4121725281674456, guid: 18be9d8304c95414ca359d3ba10cc6ad, type: 2}
       propertyPath: m_LocalPosition.x
       value: 0
@@ -728,6 +733,18 @@ Prefab:
       propertyPath: m_RootOrder
       value: 2
       objectReference: {fileID: 0}
+    - target: {fileID: 114415616533556410, guid: 18be9d8304c95414ca359d3ba10cc6ad,
+        type: 2}
+      propertyPath: ripplePrefabs.Array.data[0]
+      value: 
+      objectReference: {fileID: 1638987758043708, guid: 2fe4803cb08f97547ba42c5e81f6d946,
+        type: 2}
+    - target: {fileID: 114415616533556410, guid: 18be9d8304c95414ca359d3ba10cc6ad,
+        type: 2}
+      propertyPath: ripplePrefabs.Array.data[1]
+      value: 
+      objectReference: {fileID: 1418409906975308, guid: c4a7113e2a7e1c9429260d1637df8c80,
+        type: 2}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 18be9d8304c95414ca359d3ba10cc6ad, type: 2}
   m_IsPrefabParent: 0

@@ -56,7 +56,7 @@ public class BgControl : MonoBehaviour
 
 		//GetComponent<Animator>().Play(StarLike",0,.5f);
 
-		print(curTime);
+		//print(curTime);
 
 		animator.SetFloat("Direction", curSpeedRate);
 	}
