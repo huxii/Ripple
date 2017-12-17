@@ -24,6 +24,7 @@ public class BallControl : MonoBehaviour
 	float initSpeed;
 	float ballSpeedRate;
 	int delayTime;
+    float scale;
 
 	// Use this for initialization
 	void Start () 
@@ -37,8 +38,8 @@ public class BallControl : MonoBehaviour
 		delayTime = 5;
 		initSpeed = 3.5f;
 		ballSpeedRate = 1.0f;
-		//timer = -10;
-	}
+        //timer = -10;
+    }
 
 	void Update()
 	{	
@@ -69,15 +70,17 @@ public class BallControl : MonoBehaviour
 		if (thisCollision.collider.tag == "Wall")
 		{
 			manager.SendMessage("BallHitBorder", this.gameObject);
-            animator.SetTrigger("Hit");
 
             FlipColor();
 		}
         else
         if (thisCollision.collider.tag == "Player")
         {
-            animator.SetTrigger("Hit");
         }
+
+        transform.DOShakeScale(0.25f, new Vector3(scale * 0.3f, scale * 0.3f, 0), 1, 90, true).OnComplete(
+          () => { transform.DOScale(new Vector3(scale, scale, scale), 0.25f); }
+          );
     }
 
 	void OnTriggerEnter2D(Collider2D other)
@@ -99,16 +102,23 @@ public class BallControl : MonoBehaviour
 		type = _type;
 		color = _colorIndex;
 
-        /*
-		if (color == 0)
-		{
-			GetComponent<Animator>().Play("Spawn0", 0);
-		}
-		else
-		{
-			GetComponent<Animator>().Play("Spawn0", 0);
-		}
-        */
+        switch (type)
+        {
+            case 0:
+                transform.localScale = new Vector3(1f, 1f, 1f);
+                scale = 1f;
+                break;
+            case 1:
+                transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
+                scale = 0.8f;
+                break;
+            case 2:
+                transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
+                scale = 0.5f;
+                break;
+            default:
+                break;
+        }
 	}
 
 	public void collideDelay()

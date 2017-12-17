@@ -10,34 +10,38 @@ public class BorderControl : MonoBehaviour
 	GameObject manager;
 	Animator animator;
 
+    float scale;
 	float originalScale;
 
 	void Start () 
 	{
 		manager = GameObject.Find ("GameManager");
-		animator = GetComponent<Animator>();
+		animator = GetComponentInChildren<Animator>();
 
 		originalScale = transform.localScale.x;
-	}
+        scale = originalScale;
+
+    }
 	
 	// Update is called once per frame
 	void Update () 
 	{
 	}
 
-	/*
 	void OnCollisionEnter2D(Collision2D thisCollision)
 	{
 		if (thisCollision.collider.tag == "Ball") 
 		{
-			manager.SendMessage ("BorderHit");
+            transform.DOShakeScale(0.25f, new Vector3(0.02f, 0.02f, 0), 1, 90, true).OnComplete(
+                () => { transform.DOScale(new Vector3(scale, scale, scale), 0.25f); }
+                );
 		}
 	}
-	*/
 
 	public void Shrink()
 	{
-        float scale = transform.localScale.x * shrinkScale;
+        scale = transform.localScale.x * shrinkScale;
+        transform.DOShakePosition(1f, 0.5f);
         transform.DOScale(new Vector3(scale, scale, scale), 0.5f).SetEase(Ease.InOutCubic);
 	}
 
@@ -45,7 +49,7 @@ public class BorderControl : MonoBehaviour
 	{
 		if (Mathf.Abs(transform.localScale.x - originalScale) > 1e-5)
 		{
-            float scale = transform.localScale.x / shrinkScale;
+            scale = transform.localScale.x / shrinkScale;
             transform.DOScale(new Vector3(scale, scale, scale), 0.5f).SetEase(Ease.InOutCubic);
         }
 	}

@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class MainControl : MonoBehaviour
 {
-	public List<GameObject> ballPrefabs;
+	public GameObject ballPrefabs;
 	public List<GameObject> ripplePrefabs;
 	public List<GameObject> popPrefabs;
 
@@ -262,7 +262,7 @@ public class MainControl : MonoBehaviour
 
 	void SpawnNewBall(int type, int colorIndex, Vector3 pos, Vector2 v)
 	{
-		GameObject ball = Instantiate(ballPrefabs[type], pos, Quaternion.identity) as GameObject;
+		GameObject ball = Instantiate(ballPrefabs, pos, Quaternion.identity) as GameObject;
 		ball.GetComponent<BallControl>().Init(type, colorIndex, v.x, v.y);
 		balls.Add(ball);		
 	}
