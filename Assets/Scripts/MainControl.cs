@@ -51,9 +51,9 @@ public class MainControl : MonoBehaviour
         loader = GameObject.FindGameObjectWithTag("Loader").GetComponent<LoadingControl>();
         loader.FadeIn(3f);
 
-		bgm = GameObject.Find("BGM");
-		if (bgm && bgm.GetComponent<BGMControl>().count > 0)
-		{
+		bgm = GameObject.FindGameObjectWithTag("BGM");
+        if (bgm && bgm.transform.position.x > 0)
+        { 
 			curMaxBallNumber = maxBallNumber;
 			gameState = GameState.Game;
 		}
@@ -269,16 +269,6 @@ public class MainControl : MonoBehaviour
 
 	void Scoring(int thisScore)
 	{
-		if (thisScore > 0)
-		{
-            // pop animation
-            GameObject pop = Instantiate(popPrefabs[0], border.transform) as GameObject;
-        }
-		else
-		{	// pop animation
-            GameObject pop = Instantiate(popPrefabs[1], border.transform) as GameObject;
-        }
-
 		score += thisScore;
 		scoreText.text = score.ToString();
 	}
@@ -451,13 +441,15 @@ public class MainControl : MonoBehaviour
 
 			if (signColor != ballColor)
 			{
-				Scoring(-(ball.GetComponent<BallControl>().type + 1));
+                GameObject pop = Instantiate(popPrefabs[1], border.transform) as GameObject;
+                Scoring(-(ball.GetComponent<BallControl>().type + 1));
 				Shrink();
 				//print("....");
 			}
 			else
 			{
-				int tmp = ball.GetComponent<BallControl>().type + 1;
+                GameObject pop = Instantiate(popPrefabs[0], border.transform) as GameObject;
+                int tmp = ball.GetComponent<BallControl>().type + 1;
 				Scoring(tmp * tmp);
 				//Expand();
 			}

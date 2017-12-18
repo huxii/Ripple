@@ -40,9 +40,12 @@ public class BorderControl : MonoBehaviour
 
 	public void Shrink()
 	{
+        Vector3 pos = transform.position;
         scale = transform.localScale.x * shrinkScale;
-        transform.DOShakePosition(1f, 0.5f);
-        transform.DOScale(new Vector3(scale, scale, scale), 0.5f).SetEase(Ease.InOutCubic);
+        transform.DOShakePosition(1f, 0.4f).SetEase(Ease.InOutCubic).OnComplete(
+            () => { transform.DOMove(pos, 0.2f); }
+        );
+        transform.DOScale(new Vector3(scale, scale, scale), 0.6f).SetEase(Ease.InOutCubic);
 	}
 
 	public void Expand()

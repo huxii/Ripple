@@ -7,9 +7,9 @@ TagManager:
   - Ball
   - Sign
   - Wall
-  - BGM
   - Manager
   - Loader
+  - BGM
   layers:
   - Default
   - TransparentFX
