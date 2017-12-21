@@ -117,14 +117,14 @@ public class MainControl : MonoBehaviour
 			{
 				SetBallSpeedRate(0.1f);
 				border.GetComponent<BorderControl>().SetSpeedRate(0.5f);
-				bg.GetComponent<BgControl>().Play();
+				bg.GetComponent<BgControl>().SlowDown();
 			}
 
 			if (Input.GetMouseButtonUp(1))
 			{
 				SetBallSpeedRate(1.0f);
 				border.GetComponent<BorderControl>().SetSpeedRate(1.0f);
-				bg.GetComponent<BgControl>().Reverse();
+                bg.GetComponent<BgControl>().BackToNormal();
 				
 				for (int i = 0; i < balls.Count; ++i)
 				{
@@ -145,7 +145,7 @@ public class MainControl : MonoBehaviour
 					timer = 0;
 					SetBallSpeedRate(1.0f);
 					border.GetComponent<BorderControl>().SetSpeedRate(1.0f);
-					bg.GetComponent<BgControl>().Reverse();
+                    bg.GetComponent<BgControl>().BackToNormal();
 				}
 			}
 		}
@@ -176,14 +176,14 @@ public class MainControl : MonoBehaviour
 			{
 				SetBallSpeedRate(0.1f);
 				border.GetComponent<BorderControl>().SetSpeedRate(0.5f);
-				bg.GetComponent<BgControl>().Play();
+				bg.GetComponent<BgControl>().SlowDown();
 			}
 
 			if (Input.GetMouseButtonUp(1))
 			{
 				SetBallSpeedRate(1.0f);
 				border.GetComponent<BorderControl>().SetSpeedRate(1.0f);
-				bg.GetComponent<BgControl>().Reverse();
+				bg.GetComponent<BgControl>().BackToNormal();
 			}
 			/*
 			if (Input.GetKeyDown("space"))
@@ -200,8 +200,8 @@ public class MainControl : MonoBehaviour
 					timer = 0;
 					SetBallSpeedRate(1.0f);
 					border.GetComponent<BorderControl>().SetSpeedRate(1.0f);
-					bg.GetComponent<BgControl>().Reverse();
-				}
+					bg.GetComponent<BgControl>().BackToNormal();
+                }
 			}
 		}
 		else

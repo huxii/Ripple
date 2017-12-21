@@ -10,69 +10,47 @@ public class BgControl : MonoBehaviour
 	float curSpeedRate;
 	float playSpeedRate;
 	float reverseSpeedRate;
-	/*
-	int desiredTimer;
-	float animLength;
-	int timer;
-	*/
+    bool slowDown;
 
 	// Use this for initialization
 	void Start()
 	{
-		manager = GameObject.Find("GameManager");
+		manager = GameObject.FindGameObjectWithTag("Manager");
 			
 		animator = GetComponent<Animator>();
 		curSpeedRate = 0.0f;
-		playSpeedRate = 1.0f;
+		playSpeedRate = 3.0f;
 		reverseSpeedRate = -5.0f;
-
-		/*
-		desiredTimer = -5;
-		animLength = 4.25f;
-		timer = 0;
-		*/
+        slowDown = false;
 	}
 
 	// Update is called once per frame
 	void Update()
 	{
+        // manually reset
 		float curTime = animator.GetCurrentAnimatorStateInfo(0).normalizedTime;
-		if (curSpeedRate > 0)
+		if (animator.GetCurrentAnimatorStateInfo(0).IsName("StarDust") && curTime <= 0.05f && !slowDown)
 		{
-			if (curTime >= 0.95f)
-			{
-				Reverse();
-			}
+            animator.Play("BgAppear", 0, 0.0f);
 		}
-		else
-		{
-			if (curTime <= 0.05f)
-			{
-				Stop();
-				animator.Play("StarLike", 0, 0.0f);
-				manager.SendMessage("SetBallSpeedRate", 1.0f);
-			}
-		}
-
 		//GetComponent<Animator>().Play(StarLike",0,.5f);
 
 		//print(curTime);
 
-		animator.SetFloat("Direction", curSpeedRate);
+		animator.SetFloat("direction", curSpeedRate);
 	}
 
-	public void Play()
-	{
-		curSpeedRate = playSpeedRate;
-	}
+    public void SlowDown()
+    {
+        curSpeedRate = playSpeedRate;
+        animator.SetFloat("direction", curSpeedRate);
+        animator.SetBool("slowDown", true);
+    }
 
-	public void Stop()
-	{
-		curSpeedRate = 0.0f;
-	}
-
-	public void Reverse()
-	{
-		curSpeedRate = reverseSpeedRate;
-	}
+    public void BackToNormal()
+    {
+        curSpeedRate = reverseSpeedRate;
+        animator.SetFloat("direction", curSpeedRate);
+        animator.SetBool("slowDown", false);
+    }
 }

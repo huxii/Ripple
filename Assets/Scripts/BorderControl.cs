@@ -6,6 +6,8 @@ using DG.Tweening;
 public class BorderControl : MonoBehaviour 
 {
 	public float shrinkScale;
+    public GameObject inner;
+    public GameObject outer;
 
 	GameObject manager;
 	Animator animator;
@@ -16,11 +18,10 @@ public class BorderControl : MonoBehaviour
 	void Start () 
 	{
 		manager = GameObject.Find ("GameManager");
-		animator = GetComponentInChildren<Animator>();
+		animator = outer.GetComponent<Animator>();
 
 		originalScale = transform.localScale.x;
         scale = originalScale;
-
     }
 	
 	// Update is called once per frame
@@ -32,10 +33,13 @@ public class BorderControl : MonoBehaviour
 	{
 		if (thisCollision.collider.tag == "Ball") 
 		{
-            transform.DOShakeScale(0.25f, new Vector3(0.02f, 0.02f, 0), 1, 90, true).OnComplete(
-                () => { transform.DOScale(new Vector3(scale, scale, scale), 0.25f); }
+            inner.transform.DOShakeScale(0.25f, new Vector3(0.02f, 0.02f, 0), 1, 90, true).OnComplete(
+                () => { inner.transform.DOScale(new Vector3(1f, 1f, 1f), 0.25f); }
                 );
-		}
+            outer.transform.DOScale(new Vector3(1.1f, 1.1f, 0), 0.25f).OnComplete(
+               () => { outer.transform.DOScale(new Vector3(1f, 1f, 1f), 0.25f); }
+               );
+        }
 	}
 
 	public void Shrink()
