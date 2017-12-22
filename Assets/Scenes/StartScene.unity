@@ -174,8 +174,8 @@ Camera:
     y: 0
     width: 1
     height: 1
-  near clip plane: 0.3
-  far clip plane: 1000
+  near clip plane: -10
+  far clip plane: 10
   field of view: 60
   orthographic: 1
   orthographic size: 5
@@ -200,7 +200,7 @@ Transform:
   m_PrefabInternal: {fileID: 0}
   m_GameObject: {fileID: 845840159}
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: -10}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
@@ -468,6 +468,11 @@ Prefab:
       propertyPath: m_UiScaleMode
       value: 1
       objectReference: {fileID: 0}
+    - target: {fileID: 223415516518587042, guid: 05d065f3cc16bf048818a554aa2172f0,
+        type: 2}
+      propertyPath: m_PlaneDistance
+      value: 0
+      objectReference: {fileID: 0}
     m_RemovedComponents: []
   m_ParentPrefab: {fileID: 100100000, guid: 05d065f3cc16bf048818a554aa2172f0, type: 2}
   m_IsPrefabParent: 0
@@ -536,7 +541,7 @@ Canvas:
   serializedVersion: 3
   m_RenderMode: 1
   m_Camera: {fileID: 845840163}
-  m_PlaneDistance: 100
+  m_PlaneDistance: 0
   m_PixelPerfect: 0
   m_ReceivesEvents: 1
   m_OverrideSorting: 0
@@ -589,7 +594,7 @@ Prefab:
       objectReference: {fileID: 0}
     - target: {fileID: 4121725281674456, guid: 18be9d8304c95414ca359d3ba10cc6ad, type: 2}
       propertyPath: m_LocalPosition.z
-      value: -5399.9995
+      value: 0
       objectReference: {fileID: 0}
     - target: {fileID: 4121725281674456, guid: 18be9d8304c95414ca359d3ba10cc6ad, type: 2}
       propertyPath: m_LocalRotation.x

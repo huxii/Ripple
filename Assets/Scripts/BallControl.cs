@@ -17,40 +17,39 @@ public class BallControl : MonoBehaviour
 	//private variables are more like the global variables in Phaser, and 
 	//they can't be accessed by other scripts
 	Rigidbody2D rb; //a reference to the Rigidbody2D component on this object
-	GameObject manager;
+	MainControl manager;
     Animator animator;
     SpriteRenderer spriteRenderer;
 	int spriteIndex;
 	float initSpeed;
 	float ballSpeedRate;
-	int delayTime;
     float scale;
+    bool dying;
 
 	// Use this for initialization
 	void Start () 
 	{
-		manager = GameObject.Find ("GameManager");
+		manager = GameObject.Find ("GameManager").GetComponent<MainControl>();
 		rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
 
         spriteIndex = 0;
-		delayTime = 5;
 		initSpeed = 3.5f;
 		ballSpeedRate = 1.0f;
-        //timer = -10;
+        timer = 0;
+        dying = false;
     }
 
 	void Update()
 	{	
 		++timer;
-		if (timer == 0) 
-		{
-			manager.SendMessage ("SplitBall", this.gameObject);	
-		}
 
-		//if (Mathf.abs(rb.velocity.x) < 0.2)
-	}
+        if (!dying && OutOfBorder())
+        {
+            Die(1f, true);
+        }
+    }
 
 	// FixedUpdate is called along with the physics engine, at regular time intervals 
 	// It's often used whenever you want to interact with physics components, as we do here
@@ -67,29 +66,54 @@ public class BallControl : MonoBehaviour
 
 	void OnCollisionEnter2D(Collision2D thisCollision)
 	{
-		if (thisCollision.collider.tag == "Wall")
-		{
-			manager.SendMessage("BallHitBorder", this.gameObject);
-
-            FlipColor();
+        if (thisCollision.collider.tag == "Wall")
+        {
+            if (timer >= 5)
+            {
+                if (manager.BallHitBorder(gameObject))
+                {
+                    Split();
+                }
+                else
+                {
+                    Bounce();
+                    FlipColor();
+                }
+            }
 		}
         else
         if (thisCollision.collider.tag == "Player")
         {
+            Bounce();
         }
 
-        transform.DOShakeScale(0.25f, new Vector3(scale * 0.3f, scale * 0.3f, 0), 1, 90, true).OnComplete(
-          () => { transform.DOScale(new Vector3(scale, scale, scale), 0.25f); }
-          );
     }
 
 	void OnTriggerEnter2D(Collider2D other)
 	{
 		if (other.tag == "Sign") 
 		{
-			manager.SendMessage ("BallHitSign", this.gameObject);
+			manager.BallHitSign(gameObject);
 		}
 	}
+
+    bool OutOfBorder()
+    {
+        // outside of border
+        RaycastHit2D[] hits = Physics2D.RaycastAll(
+            new Vector2(0, 0), new Vector2(transform.position.x, transform.position.y), transform.position.magnitude
+        );
+        foreach (RaycastHit2D hit in hits)
+        {
+            if (hit.collider.gameObject.CompareTag("Wall"))
+            {
+                manager.RemoveBall(gameObject);
+                return true;
+            }
+        }
+
+        return false;
+    }
 
 	public void Init(int _type, int _colorIndex, float _vx, float _vy)
 	{
@@ -105,26 +129,24 @@ public class BallControl : MonoBehaviour
         switch (type)
         {
             case 0:
-                transform.localScale = new Vector3(1f, 1f, 1f);
                 scale = 1f;
                 break;
             case 1:
-                transform.localScale = new Vector3(0.8f, 0.8f, 0.8f);
                 scale = 0.8f;
                 break;
             case 2:
-                transform.localScale = new Vector3(0.5f, 0.5f, 0.5f);
                 scale = 0.5f;
                 break;
             default:
                 break;
         }
-	}
 
-	public void collideDelay()
-	{
-		timer = -delayTime;
-	}
+        if (!dying)
+        {
+            transform.localScale = new Vector3(0, 0, 0);
+            Born();
+        }
+    }
 
 	public void FlipColor()
 	{
@@ -147,4 +169,36 @@ public class BallControl : MonoBehaviour
 	{
 		ballSpeedRate = rate;
 	}
+
+    public void Born()
+    {
+        transform.DOScale(new Vector3(scale, scale, scale), 0.3f).SetEase(Ease.InOutCubic);
+    }
+
+    public void Split()
+    {
+        rb.velocity = new Vector3(0, 0, 0);
+        transform.DOScale(new Vector3(0, 0, 0), 0.3f).SetEase(Ease.InOutCubic).OnComplete(
+            () => {  Destroy(gameObject); }
+        );
+    }
+
+    public void Bounce()
+    {
+        transform.DOShakeScale(0.25f, new Vector3(scale * 0.3f, scale * 0.3f, 0), 1, 90, true).OnComplete(
+            () => { transform.DOScale(new Vector3(scale, scale, scale), 0.25f); }
+        );
+    }
+
+    public void Die(float duration = 0.3f, bool stop = false)
+    {
+        dying = true;
+        if (stop)
+        {
+            rb.velocity = new Vector3(0, 0, 0);
+        }
+        transform.DOScale(new Vector3(0, 0, 0), duration).SetEase(Ease.InOutCubic).OnComplete(
+            () => { Destroy(gameObject); }
+        );
+    }
 }

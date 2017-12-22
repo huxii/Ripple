@@ -36,8 +36,6 @@ public class MainControl : MonoBehaviour
     LoadingControl loader;
 	GameObject bgm;
 	List<GameObject> balls;
-	int lastBouncerIndex;
-	int lastBallColor;
 	float ballSpeedRate;
 	Vector3 defaultSpawnPos;
 	int score;
@@ -69,16 +67,6 @@ public class MainControl : MonoBehaviour
 	// Update is called once per frame
 	void Update()
 	{
-		/*
-		if (bgm.GetComponent<BGMControl>().count > 0)
-		{
-			if (gameState != GameState.Over || gameState != GameState.Game)
-			{
-				hint.text = "Balls (have a maximum number) split and flip color after hitting the wall.";
-			}
-		}
-		*/
-
 		if (gameState == GameState.Rotation)
 		{
 			++stateTimer;
@@ -128,7 +116,7 @@ public class MainControl : MonoBehaviour
 				
 				for (int i = 0; i < balls.Count; ++i)
 				{
-					Destroy(balls[i].gameObject);
+                    balls[i].GetComponent<BallControl>().Die();
 				}
 
 				Init();
@@ -243,7 +231,7 @@ public class MainControl : MonoBehaviour
 		balls = new List<GameObject>();
 		SpawnNewBall(0, 1 - sign.GetComponent<SignControl>().spriteIndex, RandomPosition(), RandomVelocity());
 		ballSpeedRate = 1.0f;
-		defaultSpawnPos = new Vector3(0.0f, 0.0f, 10.0f);
+		defaultSpawnPos = new Vector3(0.0f, 0.0f, 0.0f);
 
 		score = 0;
 		timer = 300;
@@ -318,7 +306,7 @@ public class MainControl : MonoBehaviour
 		int angle = Random.Range(0, 360);
 		float x = radius * Mathf.Cos(angle / Mathf.PI);
 		float y = radius * Mathf.Sin(angle / Mathf.PI);
-		return new Vector3(x, y, 10);
+		return new Vector3(x, y, 0);
 	}
 
 	Vector2 RandomVelocity()
@@ -338,96 +326,54 @@ public class MainControl : MonoBehaviour
 		return new Vector2(x, y);
 	}
 
-	public void BallHitBorder(GameObject ball)
+	public bool BallHitBorder(GameObject ball)
 	{
-		ball.GetComponent<BallControl>().collideDelay();
-		lastBallColor = ball.GetComponent<BallControl>().color;
+		int colorIdx = ball.GetComponent<BallControl>().color;
 
-		Vector3 pos = new Vector3(Random.Range(-10f, 10f), Random.Range(-8f, 8f), 10.0f);
-		GameObject ripple = Instantiate(ripplePrefabs[lastBallColor], pos, Quaternion.identity) as GameObject;
+		Vector3 pos = new Vector3(Random.Range(-10f, 10f), Random.Range(-8f, 8f), 0);
+		GameObject ripple = Instantiate(ripplePrefabs[colorIdx], pos, Quaternion.identity) as GameObject;
 		ripple.GetComponent<RippleControl>().Init(ball.GetComponent<BallControl>().type);
+
+        int type = ball.GetComponent<BallControl>().type;
+        if (type <= 1 && balls.Count < curMaxBallNumber)
+        {
+            SplitBall(ball);
+            return true;
+            //
+        }
+        else
+        {
+            //RemoveBall(ball);
+        }
+
+        return false;
 	}
 
 	public void SplitBall(GameObject ball)
 	{
 		int type = ball.GetComponent<BallControl>().type;
+        Vector3 pos = ball.transform.position;
+        Vector3 v = ball.GetComponent<Rigidbody2D>().velocity;
+        Vector2 v0 = new Vector2();
+        Vector2 v1 = new Vector2();
+        Vector3 pos0 = pos;
+        Vector3 pos1 = pos;
+        v0.x = v.y;
+        v0.y = -v.x;
+        v1.x = -v.y;
+        v1.y = v.x;
 
-		if (lastBouncerIndex <= 3)
-		{
-			if (type <= 1 && balls.Count < curMaxBallNumber)
-			{
-				Vector3 pos = ball.transform.position;
-				Vector3 v = ball.GetComponent<Rigidbody2D>().velocity;
+        SpawnNewBall(type + 1, 1 - ball.GetComponent<BallControl>().color, pos0, v0);
+        SpawnNewBall(type + 1, 1 - ball.GetComponent<BallControl>().color, pos1, v1);
 
-				Vector2 v0 = new Vector2();
-				Vector2 v1 = new Vector2();
-				Vector3 pos0 = pos;
-				Vector3 pos1 = pos;
-				if (lastBouncerIndex == 0)
-				{
-					// top
-					v0.x = v.y;
-					v1.x = -v.y;
-					v0.y = Mathf.Abs(v.x);
-					v1.y = v0.y;
-					pos0.x += 0.3f;
-					pos1.x -= 0.3f;
-				}
-				else
-				if (lastBouncerIndex == 1)
-				{
-					// bottom
-					v0.x = v.y;
-					v1.x = -v.y;
-					v0.y = Mathf.Abs(v.x) * -1;
-					v1.y = v0.y;	
-					pos0.x += 0.3f;
-					pos1.x -= 0.3f;
-				}
-				else
-				if (lastBouncerIndex == 2)
-				{
-					// right
-					v0.y = v.x; 
-					v1.y = -v.x;
-					v0.x = Mathf.Abs(v.y) * -1;
-					v1.x = v0.x;
-					pos0.y += 0.3f;
-					pos1.y -= 0.3f;
-				}
-				else
-				if (lastBouncerIndex == 3)
-				{
-					//left
-					v0.y = v.x;
-					v1.y = -v.x;
-					v0.x = Mathf.Abs(v.y);
-					v1.x = v0.x;
-					pos0.y += 0.3f;
-					pos1.y -= 0.3f;
-				}
-                
-				SpawnNewBall(type + 1, 1 - ball.GetComponent<BallControl>().color, pos0, v0);
-				SpawnNewBall(type + 1, 1 - ball.GetComponent<BallControl>().color, pos1, v1);
-
-				balls.Remove(ball);
-				Destroy(ball);
-			}
-
-			//print(lastBouncerIndex);
-		}
-			
-		//print(balls.Count);
+        balls.Remove(ball);
 	}
 
-	public void BallHitSign(GameObject ball)
+    public void BallHitSign(GameObject ball)
 	{
 		if (ball)
 		{
-			Destroy(ball);
-			balls.Remove(ball);
-
-			if (balls.Count < curMaxBallNumber - 1)
+			if (balls.Count <= curMaxBallNumber - 1)
 			{
 				Vector3 pos = RandomPosition();
 				Vector3 v = RandomVelocity();
@@ -453,7 +399,10 @@ public class MainControl : MonoBehaviour
 				Scoring(tmp * tmp);
 				//Expand();
 			}
-		}
+
+            balls.Remove(ball);
+            ball.GetComponent<BallControl>().Die();
+        }
 
 		// ink
 	}
@@ -476,4 +425,9 @@ public class MainControl : MonoBehaviour
 	{
 		ballSpeedRate = speedRate;
 	}
+
+    public void RemoveBall(GameObject ball)
+    {
+        balls.Remove(ball);
+    }
 }
