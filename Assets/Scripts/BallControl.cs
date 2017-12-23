@@ -172,11 +172,21 @@ public class BallControl : MonoBehaviour
 
     public void Born()
     {
+        if (dying)
+        {
+            return;
+        }
+
         transform.DOScale(new Vector3(scale, scale, scale), 0.3f).SetEase(Ease.InOutCubic);
     }
 
     public void Split()
     {
+        if (dying)
+        {
+            return;
+        }
+
         rb.velocity = new Vector3(0, 0, 0);
         transform.DOScale(new Vector3(0, 0, 0), 0.3f).SetEase(Ease.InOutCubic).OnComplete(
             () => {  Destroy(gameObject); }
@@ -185,6 +195,11 @@ public class BallControl : MonoBehaviour
 
     public void Bounce()
     {
+        if (dying)
+        {
+            return;
+        }
+
         transform.DOShakeScale(0.25f, new Vector3(scale * 0.3f, scale * 0.3f, 0), 1, 90, true).OnComplete(
             () => { transform.DOScale(new Vector3(scale, scale, scale), 0.25f); }
         );
@@ -192,6 +207,10 @@ public class BallControl : MonoBehaviour
 
     public void Die(float duration = 0.3f, bool stop = false)
     {
+        if (dying)
+        {
+            return;
+        }
         dying = true;
         if (stop)
         {
