@@ -11,6 +11,7 @@ public class ButtonControl : MonoBehaviour
 
     MenuControl menuManager;
     bool interactable;
+    AudioSource clickSound;
 
 	// Use this for initialization
 	void Start()
@@ -19,6 +20,7 @@ public class ButtonControl : MonoBehaviour
         transform.DOScale(new Vector3(0.8f, 0.8f, 0.8f), 0f);
         logo.transform.DOScale(new Vector3(0f, 0f, 0f), 0f);
         interactable = true;
+        clickSound = GetComponent<AudioSource>();
     }
 	
 	// Update is called once per frame
@@ -56,6 +58,7 @@ public class ButtonControl : MonoBehaviour
             logo.GetComponent<Animator>().SetTrigger("Clicked");
             GetComponent<SpriteRenderer>().enabled = false;
             StartCoroutine(DelayToLoad(1, 1.1f));
+            clickSound.Play();
         }
 	}
 

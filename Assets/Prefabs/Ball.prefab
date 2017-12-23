@@ -139,6 +139,8 @@ MonoBehaviour:
   sprites:
   - {fileID: 21300000, guid: 90121fe0219e33246837d4ad09fd3696, type: 3}
   - {fileID: 21300000, guid: 39644d8201bcf474ba8d0909e624110f, type: 3}
+  hitParticlePrefab: {fileID: 1917859676071522, guid: ece919f2175fe404ba75b4fa66aec4d4,
+    type: 2}
   type: 0
   color: 0
   timer: 0

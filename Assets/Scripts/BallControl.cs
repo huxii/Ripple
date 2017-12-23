@@ -10,6 +10,7 @@ public class BallControl : MonoBehaviour
     //public float horizontalSpeed; //the ball's constant horizontal speed
     //public float maxVerticalSpeed; //the maximum vertical speed
     public Sprite[] sprites;
+    public GameObject hitParticlePrefab;
 	public int type;
 	public int color;
 	public int timer;
@@ -191,6 +192,8 @@ public class BallControl : MonoBehaviour
         transform.DOScale(new Vector3(0, 0, 0), 0.3f).SetEase(Ease.InOutCubic).OnComplete(
             () => {  Destroy(gameObject); }
         );
+
+        GameObject particle = Instantiate(hitParticlePrefab, transform.position, Quaternion.identity);
     }
 
     public void Bounce()

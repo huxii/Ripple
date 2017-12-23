@@ -1562,4 +1562,4 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cc5c097a14cc29d4ba14113535fdcb5b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  friction: {x: 5, y: 8}
+  friction: {x: 6, y: 12}
