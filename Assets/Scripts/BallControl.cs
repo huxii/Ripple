@@ -21,7 +21,8 @@ public class BallControl : MonoBehaviour
 	MainControl manager;
     Animator animator;
     SpriteRenderer spriteRenderer;
-	int spriteIndex;
+    AudioSource hitConAudio;
+    int spriteIndex;
 	float initSpeed;
 	float ballSpeedRate;
     float scale;
@@ -34,6 +35,7 @@ public class BallControl : MonoBehaviour
 		rb = GetComponent<Rigidbody2D>();
         animator = GetComponent<Animator>();
         spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        hitConAudio = GetComponentInChildren<AudioSource>();
 
         spriteIndex = 0;
 		initSpeed = 3.5f;
@@ -86,6 +88,7 @@ public class BallControl : MonoBehaviour
         if (thisCollision.collider.tag == "Player")
         {
             Bounce();
+            hitConAudio.Play();
         }
 
     }

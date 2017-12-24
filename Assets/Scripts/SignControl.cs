@@ -10,13 +10,15 @@ public class SignControl : MonoBehaviour
 	GameObject manager;
 	Animator animator;
 	SpriteRenderer spriteRenderer;
+    AudioSource changeColorAudio;
 
 	// Use this for initialization
 	void Start () 
 	{
 		manager = GameObject.Find ("GameManager");
 		animator = GetComponent<Animator>();
-
+        changeColorAudio = GetComponent<AudioSource>();
+        
 		spriteIndex = 0;
 		spriteRenderer = GetComponent<SpriteRenderer>();
 	}
@@ -40,6 +42,7 @@ public class SignControl : MonoBehaviour
 	{
 		spriteIndex = 1 - spriteIndex;
 		animator.SetInteger("color", spriteIndex);
+        changeColorAudio.Play();
 		//spriteRenderer.sprite = sprites[spriteIndex];
 	}
 

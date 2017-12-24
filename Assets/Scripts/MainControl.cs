@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 using UnityEngine.SceneManagement;
+using DG.Tweening;
 
 public class MainControl : MonoBehaviour
 {
@@ -103,16 +104,12 @@ public class MainControl : MonoBehaviour
 			
 			if (Input.GetMouseButtonDown(1))
 			{
-				SetBallSpeedRate(0.1f);
-				border.GetComponent<BorderControl>().SetSpeedRate(0.5f);
-				bg.GetComponent<BgControl>().SlowDown();
+                SlowDown();
 			}
 
 			if (Input.GetMouseButtonUp(1))
 			{
-				SetBallSpeedRate(1.0f);
-				border.GetComponent<BorderControl>().SetSpeedRate(1.0f);
-                bg.GetComponent<BgControl>().BackToNormal();
+                BackToNormal();
 				
 				for (int i = 0; i < balls.Count; ++i)
 				{
@@ -131,9 +128,8 @@ public class MainControl : MonoBehaviour
 				if (timer < 0)
 				{
 					timer = 0;
-					SetBallSpeedRate(1.0f);
-					border.GetComponent<BorderControl>().SetSpeedRate(1.0f);
-                    bg.GetComponent<BgControl>().BackToNormal();
+
+                    BackToNormal();
 				}
 			}
 		}
@@ -162,16 +158,12 @@ public class MainControl : MonoBehaviour
 
 			if (Input.GetMouseButtonDown(1))
 			{
-				SetBallSpeedRate(0.1f);
-				border.GetComponent<BorderControl>().SetSpeedRate(0.5f);
-				bg.GetComponent<BgControl>().SlowDown();
+                SlowDown();
 			}
 
 			if (Input.GetMouseButtonUp(1))
 			{
-				SetBallSpeedRate(1.0f);
-				border.GetComponent<BorderControl>().SetSpeedRate(1.0f);
-				bg.GetComponent<BgControl>().BackToNormal();
+                BackToNormal();
 			}
 			/*
 			if (Input.GetKeyDown("space"))
@@ -186,9 +178,7 @@ public class MainControl : MonoBehaviour
 				if (timer < 0)
 				{
 					timer = 0;
-					SetBallSpeedRate(1.0f);
-					border.GetComponent<BorderControl>().SetSpeedRate(1.0f);
-					bg.GetComponent<BgControl>().BackToNormal();
+                    BackToNormal();
                 }
 			}
 		}
@@ -247,6 +237,22 @@ public class MainControl : MonoBehaviour
 
         loader.Load(0, 3f);
 	}
+
+    void SlowDown()
+    {
+        SetBallSpeedRate(0.1f);
+        border.GetComponent<BorderControl>().SetSpeedRate(0.5f);
+        bg.GetComponent<BgControl>().SlowDown();
+        bgm.GetComponent<AudioSource>().DOFade(0.2f, 0.5f);
+    }
+
+    void BackToNormal()
+    {
+        SetBallSpeedRate(1.0f);
+        border.GetComponent<BorderControl>().SetSpeedRate(1.0f);
+        bg.GetComponent<BgControl>().BackToNormal();
+        bgm.GetComponent<AudioSource>().DOFade(1.0f, 0.5f);
+    }
 
 	void SpawnNewBall(int type, int colorIndex, Vector3 pos, Vector2 v)
 	{

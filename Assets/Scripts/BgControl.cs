@@ -1,12 +1,14 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class BgControl : MonoBehaviour
 {
 	GameObject manager;
 
 	Animator animator;
+    AudioSource slowDownAudio;
 	float curSpeedRate;
 	float playSpeedRate;
 	float reverseSpeedRate;
@@ -18,6 +20,7 @@ public class BgControl : MonoBehaviour
 		manager = GameObject.FindGameObjectWithTag("Manager");
 			
 		animator = GetComponent<Animator>();
+        slowDownAudio = GetComponent<AudioSource>();
 		curSpeedRate = 0.0f;
 		playSpeedRate = 3.0f;
 		reverseSpeedRate = -5.0f;
@@ -45,6 +48,9 @@ public class BgControl : MonoBehaviour
         curSpeedRate = playSpeedRate;
         animator.SetFloat("direction", curSpeedRate);
         animator.SetBool("slowDown", true);
+
+        slowDownAudio.Play();
+        slowDownAudio.DOFade(1f, 0.5f);
     }
 
     public void BackToNormal()
@@ -52,5 +58,9 @@ public class BgControl : MonoBehaviour
         curSpeedRate = reverseSpeedRate;
         animator.SetFloat("direction", curSpeedRate);
         animator.SetBool("slowDown", false);
+
+        slowDownAudio.DOFade(0f, 0.5f).OnComplete(
+            () => { slowDownAudio.Stop(); }
+        );
     }
 }
