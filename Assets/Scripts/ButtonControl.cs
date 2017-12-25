@@ -32,8 +32,8 @@ public class ButtonControl : MonoBehaviour
 	{
         if (interactable)
         {
-            transform.DOScale(new Vector3(1f, 1f, 1f), 1f).SetEase(Ease.InOutCubic);
-            logo.transform.DOScale(new Vector3(1f, 1f, 1f), 0.7f).SetEase(Ease.InOutCubic);
+            transform.DOScale(new Vector3(1f, 1f, 1f), 1f).SetEase(Ease.OutBack);
+            logo.transform.DOScale(new Vector3(1f, 1f, 1f), 0.7f).SetEase(Ease.OutBack);
 
             int idx = Random.Range(0, 2);
             GameObject ripple = Instantiate(ripplePrefabs[idx], transform);

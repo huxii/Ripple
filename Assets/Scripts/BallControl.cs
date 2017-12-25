@@ -181,7 +181,7 @@ public class BallControl : MonoBehaviour
             return;
         }
 
-        transform.DOScale(new Vector3(scale, scale, scale), 0.3f).SetEase(Ease.InOutCubic);
+        transform.DOScale(new Vector3(scale, scale, scale), 0.3f).SetEase(Ease.InOutBack);
     }
 
     public void Split()

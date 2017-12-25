@@ -7,203 +7,201 @@ using DG.Tweening;
 
 public class MainControl : MonoBehaviour
 {
-	public GameObject ballPrefabs;
-	public List<GameObject> ripplePrefabs;
-	public List<GameObject> popPrefabs;
+    public GameObject ballPrefabs;
+    public List<GameObject> ripplePrefabs;
+    public List<GameObject> popPrefabs;
 
-	public GameObject border;
-	public GameObject bg;
-	public GameObject sign;
-	public Text scoreText;
-	public Text timerText;
-	public Text instruction;
-	public Text hint;
+    public GameObject objects;
+    public GameObject border;
+    public GameObject bg;
+    public GameObject sign;
+    public GameObject ui;
+    public Text scoreText;
+    public Text timerText;
+    public Text instruction;
+    public Text hint;
 
-	public float minVelocity;
-	public float maxVelocity;
-	public int maxBallNumber;
-	public float minScale;
+    public float minVelocity;
+    public float maxVelocity;
+    public int maxBallNumber;
+    public float minScale;
 
-	enum GameState
-	{
-		Rotation = 0,
-		RightClick = 1,
-		LeftClick = 2,
-		Game = 3,
-		Over = 4,
-	};
+    public enum GameState
+    {
+        Rotation = 0,
+        RightClick = 1,
+        LeftClick = 2,
+        Game = 3,
+        Over = 4,
+        Undefined = 5,
+    };
 
-	GameState gameState;
+    public GameState gameState;
     LoadingControl loader;
-	GameObject bgm;
-	List<GameObject> balls;
-	float ballSpeedRate;
-	Vector3 defaultSpawnPos;
-	int score;
-	int timer;
-	int curMaxBallNumber;
+    GameObject bgm;
+    List<GameObject> balls;
+    float ballSpeedRate;
+    Vector3 defaultSpawnPos;
+    int score;
+    int timer;
+    int curMaxBallNumber;
     int stateTimer;
 
-	// Use this for initialization
-	void Start()
-	{
+    // Use this for initialization
+    void Start()
+    {
+        gameState = GameState.Undefined;
         loader = GameObject.FindGameObjectWithTag("Loader").GetComponent<LoadingControl>();
-        loader.FadeIn(3f);
+        bgm = GameObject.FindGameObjectWithTag("BGM");
 
-		bgm = GameObject.FindGameObjectWithTag("BGM");
-        if (bgm && bgm.transform.position.x > 0)
-        { 
-			curMaxBallNumber = maxBallNumber;
-			gameState = GameState.Game;
-		}
-		else
-		{
-			curMaxBallNumber = 2;
-			gameState = GameState.Rotation;
-		}
+        PrepareAssets();
+    }
 
-        Init();
-	}
-	
-	// Update is called once per frame
-	void Update()
-	{
-		if (gameState == GameState.Rotation)
-		{
-			++stateTimer;
-			instruction.text = "Move mouse to rotate the central circle";
-			hint.text = "Balls (have a maximum number) split and flip color after hitting the wall.";
-			//print(Input.GetAxis("Mouse X"));
-			if (Input.GetAxis("Mouse X") != 0.0f || Input.GetAxis("Mouse Y") != 0.0f)
-			{
-				if (stateTimer >= 10)
-				{
-					gameState = GameState.LeftClick;
-					stateTimer = 0;
-				}
-			}
-		}
-		else
-		if (gameState == GameState.LeftClick)
-		{
-			instruction.text = "'LEFT CLICK' to flip the color of central circle";
-			hint.text = "Control central circle to abosorb balls with the same color and gain scores; if not the same color, lose scores and wall shrinks.";
-			
-			if (Input.GetMouseButtonDown(0))
-			{
-				FlipColor();
-				gameState = GameState.RightClick;
-			}
-		}
-		else
-		if (gameState == GameState.RightClick)
-		{
-			++stateTimer;
-			instruction.text = "Hold 'RIGHT CLICK' to slow down";	
-			hint.text = "Slowing-down continues when timer has not gone to 0, which is recharged naturally.";
-			
-			if (Input.GetMouseButtonDown(1))
-			{
+    // Update is called once per frame
+    void Update()
+    {
+        if (gameState == GameState.Undefined)
+        {
+            return;
+        }
+
+        if (gameState == GameState.Rotation)
+        {
+            ++stateTimer;
+            instruction.text = "Move mouse to rotate the central circle";
+            hint.text = "Balls (have a maximum number) split and flip color after hitting the wall.";
+            //print(Input.GetAxis("Mouse X"));
+            if (Input.GetAxis("Mouse X") != 0.0f || Input.GetAxis("Mouse Y") != 0.0f)
+            {
+                if (stateTimer >= 10)
+                {
+                    gameState = GameState.LeftClick;
+                    stateTimer = 0;
+                }
+            }
+        }
+        else
+        if (gameState == GameState.LeftClick)
+        {
+            instruction.text = "'LEFT CLICK' to flip the color of central circle";
+            hint.text = "Control central circle to abosorb balls with the same color and gain scores; if not the same color, lose scores and wall shrinks.";
+
+            if (Input.GetMouseButtonDown(0))
+            {
+                FlipColor();
+                gameState = GameState.RightClick;
+            }
+        }
+        else
+        if (gameState == GameState.RightClick)
+        {
+            ++stateTimer;
+            instruction.text = "Hold 'RIGHT CLICK' to slow down";
+            hint.text = "Slowing-down continues when timer has not gone to 0, which is recharged naturally.";
+
+            if (Input.GetMouseButtonDown(1))
+            {
                 SlowDown();
-			}
+            }
 
-			if (Input.GetMouseButtonUp(1))
-			{
+            if (Input.GetMouseButtonUp(1))
+            {
                 BackToNormal();
-				
-				for (int i = 0; i < balls.Count; ++i)
-				{
+
+                for (int i = 0; i < balls.Count; ++i)
+                {
                     balls[i].GetComponent<BallControl>().Die();
-				}
+                }
 
-				Init();
-				Expand();Expand();Expand();
-				gameState = GameState.Game;
-				curMaxBallNumber = maxBallNumber;
-			}
+                Init();
+                Expand(); Expand(); Expand();
+                gameState = GameState.Game;
+                curMaxBallNumber = maxBallNumber;
+            }
 
-			if (ballSpeedRate < 1.0f)
-			{
-				timer -= 10;
-				if (timer < 0)
-				{
-					timer = 0;
+            if (ballSpeedRate < 1.0f)
+            {
+                timer -= 10;
+                if (timer < 0)
+                {
+                    timer = 0;
 
                     BackToNormal();
-				}
-			}
-		}
-		else
-		if (gameState == GameState.Game)
-		{
-			if (stateTimer < 200)
-			{
-				++stateTimer;
-				if (stateTimer == 200)
-				{
-					instruction.text = "";
-					hint.text = "";		
-				}
-				else
-				{
-					instruction.text = "START!";	
-					hint.text = "";			
-				}
-			}
+                }
+            }
+        }
+        else
+        if (gameState == GameState.Game)
+        {
+            if (stateTimer < 200)
+            {
+                ++stateTimer;
+                if (stateTimer == 200)
+                {
+                    instruction.text = "";
+                    hint.text = "";
+                }
+                else
+                {
+                    instruction.text = "START!";
+                    hint.text = "";
+                }
+            }
 
-			if (Input.GetMouseButtonDown(0))
-			{
-				FlipColor();
-			}
+            if (Input.GetMouseButtonDown(0))
+            {
+                FlipColor();
+            }
 
-			if (Input.GetMouseButtonDown(1))
-			{
+            if (Input.GetMouseButtonDown(1))
+            {
                 SlowDown();
-			}
+            }
 
-			if (Input.GetMouseButtonUp(1))
-			{
+            if (Input.GetMouseButtonUp(1))
+            {
                 BackToNormal();
-			}
-			/*
+            }
+            /*
 			if (Input.GetKeyDown("space"))
 			{
 				SpawnNewBall(0, 0, RandomPosition(), RandomVelocity());
 			}
 			*/
 
-			if (ballSpeedRate < 1.0f)
-			{
-				timer -= 10;
-				if (timer < 0)
-				{
-					timer = 0;
+            if (ballSpeedRate < 1.0f)
+            {
+                timer -= 10;
+                if (timer < 0)
+                {
+                    timer = 0;
                     BackToNormal();
                 }
-			}
-		}
-		else
-		{
-			SetBallSpeedRate(0.05f);
-			border.GetComponent<BorderControl>().SetSpeedRate(0.5f);
-		}
+            }
+        }
+        else
+        if (gameState == GameState.Over)
+        {
+            SetBallSpeedRate(0.05f);
+            border.GetComponent<BorderControl>().SetSpeedRate(0.5f);
+        }
 
-		if (timer < 990)
-		{
-			++timer;
-		}
+        if (timer < 990)
+        {
+            ++timer;
+        }
 
-		scoreText.text = score.ToString();
-		timerText.text = (timer / 10).ToString();
+        scoreText.text = score.ToString();
+        timerText.text = (timer / 10).ToString();
 
-		int length = balls.Count;
-		for (int i = 0; i < length; ++i)
-		{
-			GameObject ball = balls[i];
-			ball.GetComponent<BallControl>().SetSpeedRate(ballSpeedRate);
-		}
+        int length = balls.Count;
+        for (int i = 0; i < length; ++i)
+        {
+            GameObject ball = balls[i];
+            ball.GetComponent<BallControl>().SetSpeedRate(ballSpeedRate);
+        }
 
-		/*
+        /*
 		int length = balls.Count;
 		for (int i = 0; i < length; ++i)
 		{
@@ -214,9 +212,36 @@ public class MainControl : MonoBehaviour
 			}
 		}
 		*/
-	}
+    }
 
-	void Init()
+    void PrepareAssets()
+    {
+        loader.FadeIn(0.5f);
+
+        objects.transform.localScale = new Vector3(0, 0, 0);
+        ui.transform.position = new Vector3(0, 800f, 0);
+
+        objects.transform.DOScale(new Vector3(0.9f, 0.9f, 0.9f), 1f).SetEase(Ease.OutBack).SetDelay(1f).OnComplete(StartGame);
+        ui.transform.DOMove(new Vector3(0, 0, 0), 1.5f).SetEase(Ease.OutQuart);
+    }
+
+    void StartGame()
+    {
+        if (bgm && bgm.transform.position.x > 0)
+        {
+            curMaxBallNumber = maxBallNumber;
+            gameState = GameState.Game;
+        }
+        else
+        {
+            curMaxBallNumber = 2;
+            gameState = GameState.Rotation;
+        }
+
+        Init();
+    }
+
+    void Init()
 	{
 		balls = new List<GameObject>();
 		SpawnNewBall(0, 1 - sign.GetComponent<SignControl>().spriteIndex, RandomPosition(), RandomVelocity());
@@ -243,7 +268,10 @@ public class MainControl : MonoBehaviour
         SetBallSpeedRate(0.1f);
         border.GetComponent<BorderControl>().SetSpeedRate(0.5f);
         bg.GetComponent<BgControl>().SlowDown();
-        bgm.GetComponent<AudioSource>().DOFade(0.2f, 0.5f);
+        if (bgm)
+        {
+            bgm.GetComponent<AudioSource>().DOFade(0.2f, 0.5f);
+        }
     }
 
     void BackToNormal()
@@ -251,7 +279,10 @@ public class MainControl : MonoBehaviour
         SetBallSpeedRate(1.0f);
         border.GetComponent<BorderControl>().SetSpeedRate(1.0f);
         bg.GetComponent<BgControl>().BackToNormal();
-        bgm.GetComponent<AudioSource>().DOFade(1.0f, 0.5f);
+        if (bgm)
+        {
+            bgm.GetComponent<AudioSource>().DOFade(1.0f, 0.5f);
+        }
     }
 
 	void SpawnNewBall(int type, int colorIndex, Vector3 pos, Vector2 v)
