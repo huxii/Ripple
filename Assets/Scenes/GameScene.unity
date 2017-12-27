@@ -648,7 +648,7 @@ MonoBehaviour:
   minVelocity: 3
   maxVelocity: 5
   maxBallNumber: 4
-  minScale: 1
+  minScale: 0.7
   gameOverObj: {fileID: 173188245}
   shewObj: {fileID: 1563496847}
 --- !u!1 &554668193
@@ -1029,7 +1029,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Press Space to continue
+  m_Text: Balls (have a maximum number) split and flip color after hitting the wall.
 --- !u!222 &962995078
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1133,7 +1133,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: New Text
+  m_Text: Move mouse to rotate the central circle
 --- !u!222 &1026754398
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using DG.Tweening;
 
 public class SignControl : MonoBehaviour 
 {
@@ -11,6 +12,7 @@ public class SignControl : MonoBehaviour
 	Animator animator;
 	SpriteRenderer spriteRenderer;
     AudioSource changeColorAudio;
+    float scale;
 
 	// Use this for initialization
 	void Start () 
@@ -21,6 +23,8 @@ public class SignControl : MonoBehaviour
         
 		spriteIndex = 0;
 		spriteRenderer = GetComponent<SpriteRenderer>();
+
+        scale = transform.localScale.x;
 	}
 
 	// Update is called once per frame
@@ -28,15 +32,15 @@ public class SignControl : MonoBehaviour
 	{
 	}
 
-	/*
 	void OnTriggerEnter2D(Collider2D other)
 	{
 		if (other.tag == "Ball") 
 		{
-			manager.SendMessage ("BouncerHit", this.gameObject);
+            transform.DOScale(new Vector3(scale * 1.2f, scale * 1.2f, scale * 1.2f), 0.25f).OnComplete(
+                () => { transform.DOScale(new Vector3(scale, scale, scale), 0.25f); }
+                );
 		}
 	}
-	*/
 
 	public void FlipColor()
 	{

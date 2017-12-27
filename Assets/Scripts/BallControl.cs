@@ -60,10 +60,11 @@ public class BallControl : MonoBehaviour
 	{
 		float desiredSpeed = initSpeed * ballSpeedRate;
 		float currentSpeed = rb.velocity.magnitude ;
-		if (currentSpeed > 0)
-		{
-			rb.velocity *= desiredSpeed / currentSpeed;
-		}
+        if (currentSpeed > 0)
+        {
+            rb.velocity *= desiredSpeed / currentSpeed;
+        }
+
 		//so for example, if currentSpeed is 2.5, we will multiply the velocity by 2.0
 	}
 
@@ -71,7 +72,7 @@ public class BallControl : MonoBehaviour
 	{
         if (thisCollision.collider.tag == "Wall")
         {
-            if (timer >= 5)
+            if (timer >= 15)
             {
                 if (manager.BallHitBorder(gameObject))
                 {

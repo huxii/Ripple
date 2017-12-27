@@ -332,9 +332,29 @@ public class MainControl : MonoBehaviour
 
 	void SpawnNewBall(int type, int colorIndex, Vector3 pos, Vector2 v)
 	{
-		GameObject ball = Instantiate(ballPrefabs, pos, Quaternion.identity) as GameObject;
+        // outside of border
+        
+        bool isHit = false;
+        RaycastHit2D[] hits = Physics2D.RaycastAll(
+            new Vector2(0, 0), new Vector2(pos.x, pos.y), pos.magnitude
+        );
+        foreach (RaycastHit2D hit in hits)
+        {
+            if (hit.collider.gameObject.CompareTag("Wall"))
+            {
+                isHit = true;
+                break;
+            }
+        }
+
+        if (isHit)
+        {
+            pos *= 0.95f;
+        }
+
+        GameObject ball = Instantiate(ballPrefabs, pos, Quaternion.identity) as GameObject;
 		ball.GetComponent<BallControl>().Init(type, colorIndex, v.x, v.y);
-		balls.Add(ball);		
+		balls.Add(ball);	
 	}
 
 	void Scoring(int thisScore)
