@@ -129,6 +129,8 @@ public class BallControl : MonoBehaviour
 
 		type = _type;
 		color = _colorIndex;
+        spriteRenderer = GetComponentInChildren<SpriteRenderer>();
+        spriteRenderer.sprite = sprites[color];
 
         switch (type)
         {

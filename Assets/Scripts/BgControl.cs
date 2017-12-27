@@ -63,4 +63,9 @@ public class BgControl : MonoBehaviour
             () => { slowDownAudio.Stop(); }
         );
     }
+
+    public void GameOver()
+    {
+        animator.SetTrigger("over");
+    }
 }

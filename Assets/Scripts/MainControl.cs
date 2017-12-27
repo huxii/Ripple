@@ -7,25 +7,6 @@ using DG.Tweening;
 
 public class MainControl : MonoBehaviour
 {
-    public GameObject ballPrefabs;
-    public List<GameObject> ripplePrefabs;
-    public List<GameObject> popPrefabs;
-
-    public GameObject objects;
-    public GameObject border;
-    public GameObject bg;
-    public GameObject sign;
-    public GameObject ui;
-    public Text scoreText;
-    public Text timerText;
-    public Text instruction;
-    public Text hint;
-
-    public float minVelocity;
-    public float maxVelocity;
-    public int maxBallNumber;
-    public float minScale;
-
     public enum GameState
     {
         Rotation = 0,
@@ -37,8 +18,34 @@ public class MainControl : MonoBehaviour
     };
 
     public GameState gameState;
+
+    public GameObject ballPrefabs;
+    public List<GameObject> ripplePrefabs;
+    public List<GameObject> popPrefabs;
+
+    public GameObject objects;
+    public GameObject border;
+    public GameObject bg;
+    public GameObject sign;
+    public GameObject ui;
+    public GameObject hints;
+    public Text scoreText;
+    public Text timerText;
+    public Text instruction;
+    public Text hint;
+
+    public float minVelocity;
+    public float maxVelocity;
+    public int maxBallNumber;
+    public float minScale;
+
+    public GameObject gameOverObj;
+    public GameObject shewObj;
+
     LoadingControl loader;
     GameObject bgm;
+    AudioSource gameOverSound;
+    AudioSource shewSound;
     List<GameObject> balls;
     float ballSpeedRate;
     Vector3 defaultSpawnPos;
@@ -53,6 +60,8 @@ public class MainControl : MonoBehaviour
         gameState = GameState.Undefined;
         loader = GameObject.FindGameObjectWithTag("Loader").GetComponent<LoadingControl>();
         bgm = GameObject.FindGameObjectWithTag("BGM");
+        gameOverSound = gameOverObj.GetComponent<AudioSource>();
+        shewSound = shewObj.GetComponent<AudioSource>();
 
         PrepareAssets();
     }
@@ -194,11 +203,14 @@ public class MainControl : MonoBehaviour
         scoreText.text = score.ToString();
         timerText.text = (timer / 10).ToString();
 
-        int length = balls.Count;
-        for (int i = 0; i < length; ++i)
+        if (balls != null)
         {
-            GameObject ball = balls[i];
-            ball.GetComponent<BallControl>().SetSpeedRate(ballSpeedRate);
+            int length = balls.Count;
+            for (int i = 0; i < length; ++i)
+            {
+                GameObject ball = balls[i];
+                ball.GetComponent<BallControl>().SetSpeedRate(ballSpeedRate);
+            }
         }
 
         /*
@@ -220,9 +232,39 @@ public class MainControl : MonoBehaviour
 
         objects.transform.localScale = new Vector3(0, 0, 0);
         ui.transform.position = new Vector3(0, 800f, 0);
+        hints.transform.localScale = new Vector3(0, 0, 0);
 
-        objects.transform.DOScale(new Vector3(0.9f, 0.9f, 0.9f), 1f).SetEase(Ease.OutBack).SetDelay(1f).OnComplete(StartGame);
-        ui.transform.DOMove(new Vector3(0, 0, 0), 1.5f).SetEase(Ease.OutQuart);
+        objects.transform.DOScale(new Vector3(0.9f, 0.9f, 0.9f), 0.7f).SetEase(Ease.OutBack).SetDelay(1f)
+            .OnStart(
+                () => { shewSound.Play(); }
+            )
+            .OnComplete(
+                () => {
+                    shewSound.Play();
+                    hints.transform.DOScale(new Vector3(1.0f, 1.0f, 1.0f), 0.5f).SetEase(Ease.OutQuad);
+                }
+            );
+        ui.transform.DOMove(new Vector3(0, 0, 0), 2.5f).SetEase(Ease.OutQuart)
+            .OnStart(() => { shewSound.Play(); })
+            .OnComplete(StartGame);
+    }
+
+    void CollectAssets()
+    {
+        ui.transform.DOMove(new Vector3(0, 30f, 0), 1f).SetEase(Ease.OutQuart).SetDelay(1).OnStart(
+            () => { gameOverSound.Play(); shewSound.Play(); }
+            )
+            .OnComplete(
+            () => { bg.GetComponent<BgControl>().GameOver(); loader.Load(0, 1f, false); }
+            );
+
+        hints.transform.DOScale(new Vector3(0, 0, 0), 0.2f).SetEase(Ease.OutQuad).SetDelay(1.4f)
+            .OnStart(
+                () => { shewSound.Play(); }
+            )
+            .OnComplete(
+            () => { shewSound.Play(); objects.transform.DOScale(new Vector3(0.0f, 0.0f, 0.0f), 0.4f).SetEase(Ease.OutCubic); }
+            );
     }
 
     void StartGame()
@@ -257,11 +299,14 @@ public class MainControl : MonoBehaviour
 
 	void GameOver()
 	{
-		print("over");
-		gameState = GameState.Over;
+        if (gameState != GameState.Over)
+        {
+            print("over");
+            gameState = GameState.Over;
 
-        loader.Load(0, 3f);
-	}
+            CollectAssets();
+        }
+    }
 
     void SlowDown()
     {

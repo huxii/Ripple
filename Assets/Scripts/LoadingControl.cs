@@ -50,9 +50,12 @@ public class LoadingControl : MonoBehaviour
         StartCoroutine(DelayToChangeText(text, target, duration / 2));
     }
 
-	public void Load(int num, float delay = 1f)
+	public void Load(int num, float delay = 1f, bool fade = true)
 	{
-		FadeOut(delay);
+        if (fade)
+        {
+            FadeOut(delay);
+        }
 
 		StartCoroutine(LoadLevelWithDelay(num, delay));
 	}

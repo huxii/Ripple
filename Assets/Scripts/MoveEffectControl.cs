@@ -21,7 +21,7 @@ public class MoveEffectControl : MonoBehaviour
 	// Update is called once per frame
 	void Update ()
     {
-        if (!manager || (manager && manager.gameState != MainControl.GameState.Undefined))
+        if (!manager || (manager && manager.gameState != MainControl.GameState.Undefined && manager.gameState != MainControl.GameState.Over))
         {
             float lMouseX = Mathf.Max(-100f, Mathf.Min(100, Screen.width / 2 - Input.mousePosition.x));
             float lMouseY = Mathf.Max(-100f, Mathf.Min(100, Screen.height / 2 - Input.mousePosition.y));
