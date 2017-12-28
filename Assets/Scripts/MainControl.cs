@@ -7,6 +7,15 @@ using DG.Tweening;
 
 public class MainControl : MonoBehaviour
 {
+    public GameObject ballPrefabs;
+    public List<GameObject> ripplePrefabs;
+    public List<GameObject> popPrefabs;
+    public GameObject leftHintPrefab;
+    public GameObject rightHintPrefab;
+    public GameObject moveHintPrefab;
+    public GameObject tutorialPrefab;
+    public GameObject startPrefab;
+
     public enum GameState
     {
         Rotation = 0,
@@ -17,27 +26,19 @@ public class MainControl : MonoBehaviour
         Undefined = 5,
     };
 
+    public float minVelocity;
+    public float maxVelocity;
+    public int maxBallNumber;
+    public float minScale;
+
     public GameState gameState;
-
-    public GameObject ballPrefabs;
-    public List<GameObject> ripplePrefabs;
-    public List<GameObject> popPrefabs;
-
     public GameObject objects;
     public GameObject border;
     public GameObject bg;
     public GameObject sign;
     public GameObject ui;
-    public GameObject hints;
     public Text scoreText;
     public Text timerText;
-    public Text instruction;
-    public Text hint;
-
-    public float minVelocity;
-    public float maxVelocity;
-    public int maxBallNumber;
-    public float minScale;
 
     public GameObject gameOverObj;
     public GameObject shewObj;
@@ -46,6 +47,9 @@ public class MainControl : MonoBehaviour
     GameObject bgm;
     AudioSource gameOverSound;
     AudioSource shewSound;
+    GameObject mainCanvas;
+    GameObject hint;
+    GameObject instruction;
     List<GameObject> balls;
     float ballSpeedRate;
     Vector3 defaultSpawnPos;
@@ -62,6 +66,13 @@ public class MainControl : MonoBehaviour
         bgm = GameObject.FindGameObjectWithTag("BGM");
         gameOverSound = gameOverObj.GetComponent<AudioSource>();
         shewSound = shewObj.GetComponent<AudioSource>();
+        hint = null;
+        mainCanvas = GameObject.FindGameObjectWithTag("Canvas");
+
+        // barrier
+        hint = Instantiate(leftHintPrefab, mainCanvas.transform);
+        hint.transform.localScale = new Vector3(0, 0, 0);
+        instruction = hint;
 
         PrepareAssets();
     }
@@ -77,36 +88,38 @@ public class MainControl : MonoBehaviour
         if (gameState == GameState.Rotation)
         {
             ++stateTimer;
-            instruction.text = "Move mouse to rotate the central circle";
-            hint.text = "Balls (have a maximum number) split and flip color after hitting the wall.";
             //print(Input.GetAxis("Mouse X"));
-            if (Input.GetAxis("Mouse X") != 0.0f || Input.GetAxis("Mouse Y") != 0.0f)
+            if (Mathf.Abs(Input.GetAxis("Mouse X")) > 1.5f || Mathf.Abs(Input.GetAxis("Mouse Y")) > 1.5f)
             {
                 if (stateTimer >= 10)
                 {
                     gameState = GameState.LeftClick;
                     stateTimer = 0;
+
+                    CreateNewHint(leftHintPrefab);
                 }
             }
         }
         else
         if (gameState == GameState.LeftClick)
         {
-            instruction.text = "'LEFT CLICK' to flip the color of central circle";
-            hint.text = "Control central circle to abosorb balls with the same color and gain scores; if not the same color, lose scores and wall shrinks.";
-
             if (Input.GetMouseButtonDown(0))
             {
                 FlipColor();
                 gameState = GameState.RightClick;
+                stateTimer = 0;
+
+                CreateNewHint(rightHintPrefab);
             }
         }
         else
         if (gameState == GameState.RightClick)
         {
-            ++stateTimer;
-            instruction.text = "Hold 'RIGHT CLICK' to slow down";
-            hint.text = "Slowing-down continues when timer has not gone to 0, which is recharged naturally.";
+
+            if (Input.GetMouseButton(1))
+            {
+                ++stateTimer;
+            }
 
             if (Input.GetMouseButtonDown(1))
             {
@@ -117,15 +130,23 @@ public class MainControl : MonoBehaviour
             {
                 BackToNormal();
 
-                for (int i = 0; i < balls.Count; ++i)
+                if (stateTimer >= 20)
                 {
-                    balls[i].GetComponent<BallControl>().Die();
+                    for (int i = 0; i < balls.Count; ++i)
+                    {
+                        balls[i].GetComponent<BallControl>().Die();
+                    }
+
+                    Init();
+                    Expand(1f);
+                    gameState = GameState.Game;
+                    curMaxBallNumber = maxBallNumber;
+
+                    CreateNewHint();
+                    CreateNewInstruction(startPrefab);
                 }
 
-                Init();
-                Expand(); Expand(); Expand();
-                gameState = GameState.Game;
-                curMaxBallNumber = maxBallNumber;
+                stateTimer = 0;
             }
 
             if (ballSpeedRate < 1.0f)
@@ -145,16 +166,6 @@ public class MainControl : MonoBehaviour
             if (stateTimer < 200)
             {
                 ++stateTimer;
-                if (stateTimer == 200)
-                {
-                    instruction.text = "";
-                    hint.text = "";
-                }
-                else
-                {
-                    instruction.text = "START!";
-                    hint.text = "";
-                }
             }
 
             if (Input.GetMouseButtonDown(0))
@@ -231,20 +242,14 @@ public class MainControl : MonoBehaviour
         loader.FadeIn(0.5f);
 
         objects.transform.localScale = new Vector3(0, 0, 0);
-        ui.transform.position = new Vector3(0, 800f, 0);
-        hints.transform.localScale = new Vector3(0, 0, 0);
+        ui.transform.position = new Vector3(0, 20f, 0);
 
         objects.transform.DOScale(new Vector3(0.9f, 0.9f, 0.9f), 0.7f).SetEase(Ease.OutBack).SetDelay(1f)
             .OnStart(
                 () => { shewSound.Play(); }
-            )
-            .OnComplete(
-                () => {
-                    shewSound.Play();
-                    hints.transform.DOScale(new Vector3(1.0f, 1.0f, 1.0f), 0.5f).SetEase(Ease.OutQuad);
-                }
             );
-        ui.transform.DOMove(new Vector3(0, 0, 0), 2.5f).SetEase(Ease.OutQuart)
+
+        ui.transform.DOMove(new Vector3(0, 0, 0), 0.5f).SetDelay(1.5f).SetEase(Ease.OutQuart)
             .OnStart(() => { shewSound.Play(); })
             .OnComplete(StartGame);
     }
@@ -258,13 +263,18 @@ public class MainControl : MonoBehaviour
             () => { bg.GetComponent<BgControl>().GameOver(); loader.Load(0, 1f, false); }
             );
 
-        hints.transform.DOScale(new Vector3(0, 0, 0), 0.2f).SetEase(Ease.OutQuad).SetDelay(1.4f)
-            .OnStart(
-                () => { shewSound.Play(); }
-            )
-            .OnComplete(
-            () => { shewSound.Play(); objects.transform.DOScale(new Vector3(0.0f, 0.0f, 0.0f), 0.4f).SetEase(Ease.OutCubic); }
-            );
+        if (hint)
+        {
+            hint.transform.DOScale(new Vector3(0, 0, 0), 0.2f).SetEase(Ease.OutQuad).SetDelay(1.4f)
+                .OnComplete(
+                () => { shewSound.Play(); objects.transform.DOScale(new Vector3(0.0f, 0.0f, 0.0f), 0.4f).SetEase(Ease.OutCubic); }
+                );
+        }
+        else
+        {
+            shewSound.Play(); objects.transform.DOScale(new Vector3(0.0f, 0.0f, 0.0f), 0.4f).SetEase(Ease.OutCubic);
+        }
+        
     }
 
     void StartGame()
@@ -278,6 +288,9 @@ public class MainControl : MonoBehaviour
         {
             curMaxBallNumber = 2;
             gameState = GameState.Rotation;
+
+            CreateNewHint(moveHintPrefab);
+            CreateNewInstruction(tutorialPrefab);
         }
 
         Init();
@@ -293,8 +306,6 @@ public class MainControl : MonoBehaviour
 		score = 0;
 		timer = 300;
 		stateTimer = 0;
-		instruction.text = "";
-		hint.text = "";
 	}
 
 	void GameOver()
@@ -330,7 +341,47 @@ public class MainControl : MonoBehaviour
         }
     }
 
-	void SpawnNewBall(int type, int colorIndex, Vector3 pos, Vector2 v)
+    void CreateNewHint(GameObject hintPrefab = null)
+    {
+        hint.transform.DOScale(new Vector3(0f, 0f, 0f), 0.25f).SetEase(Ease.OutQuad)
+            //.OnStart(() => { shewSound.Play(); })
+            .OnComplete(
+            () =>
+            {
+
+                Destroy(hint);
+                if (hintPrefab)
+                {
+                    shewSound.Play();
+                    hint = Instantiate(hintPrefab, mainCanvas.transform);
+                    hint.transform.localScale = new Vector3(0, 0, 0);
+                    hint.transform.DOScale(new Vector3(1.0f, 1.0f, 1.0f), 0.5f).SetEase(Ease.OutQuad);
+                }
+            }
+        );
+    }
+
+    void CreateNewInstruction(GameObject insPrefab = null)
+    {
+        instruction.transform.DOScale(new Vector3(0f, 0f, 0f), 0.25f).SetEase(Ease.OutQuad)
+            //.OnStart(() => { shewSound.Play(); })
+            .OnComplete(
+            () =>
+            {
+
+                Destroy(instruction);
+                if (insPrefab)
+                {
+                    shewSound.Play();
+                    instruction = Instantiate(insPrefab, mainCanvas.transform);
+                    instruction.transform.localScale = new Vector3(0, 0, 0);
+                    instruction.transform.DOScale(new Vector3(1.0f, 1.0f, 1.0f), 0.5f).SetEase(Ease.OutQuad);
+                }
+            }
+        );
+    }
+
+    void SpawnNewBall(int type, int colorIndex, Vector3 pos, Vector2 v)
 	{
         // outside of border
         
@@ -365,8 +416,6 @@ public class MainControl : MonoBehaviour
 
 	void Shrink()
 	{
-		// sign animation
-		sign.GetComponent<SignControl>().Shrink();
 		border.GetComponent<BorderControl>().Shrink();
 
         if (border.transform.localScale.x - minScale < 1e-5)
@@ -397,10 +446,16 @@ public class MainControl : MonoBehaviour
 		*/
 	}
 
-	void Expand()
+	void Expand(float scale = -1f)
 	{
-		sign.GetComponent<SignControl>().Expand();
-		border.GetComponent<BorderControl>().Expand();
+        if (scale == -1f)
+        {
+            border.GetComponent<BorderControl>().Expand();
+        }
+        else
+        {
+            border.GetComponent<BorderControl>().Expand(scale);
+        }
 	}
 
 	Vector3 RandomPosition(float radius = 2.5f)

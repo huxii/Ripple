@@ -49,16 +49,23 @@ public class BorderControl : MonoBehaviour
         transform.DOShakePosition(1f, 0.4f).SetEase(Ease.InOutCubic).OnComplete(
             () => { transform.DOLocalMove(localPos, 0.2f); }
         );
-        transform.DOScale(new Vector3(scale, scale, scale), 0.6f).SetEase(Ease.InOutCubic);
+        transform.DOScale(new Vector3(scale, scale, scale), 0.6f).SetEase(Ease.InOutBack);
 	}
 
-	public void Expand()
+	public void Expand(float desiredScale = -1f)
 	{
-		if (Mathf.Abs(transform.localScale.x - originalScale) > 1e-5)
-		{
-            scale = transform.localScale.x / shrinkScale;
-            transform.DOScale(new Vector3(scale, scale, scale), 0.5f).SetEase(Ease.InOutCubic);
+        if (desiredScale == -1f)
+        {
+            desiredScale = transform.localScale.x / shrinkScale;
         }
+
+        if (desiredScale > originalScale)
+        {
+            desiredScale = originalScale;
+        }
+
+        scale = desiredScale;
+        transform.DOScale(new Vector3(scale, scale, scale), 0.5f).SetEase(Ease.InOutBack);
 	}
 
 	public void SetSpeedRate(float speedRate)

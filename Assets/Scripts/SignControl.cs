@@ -49,15 +49,5 @@ public class SignControl : MonoBehaviour
         changeColorAudio.Play();
 		//spriteRenderer.sprite = sprites[spriteIndex];
 	}
-
-	public void Shrink()
-	{
-		//animator.SetInteger("hit", 1);
-	}
-
-	public void Expand()
-	{
-		//animator.SetInteger("hit", 2);
-	}
 }
 
