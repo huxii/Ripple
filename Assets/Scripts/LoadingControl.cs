@@ -7,6 +7,7 @@ using DG.Tweening;
 
 public class LoadingControl : MonoBehaviour
 {
+    public bool loadWithProgress = false;
 	public Slider loadingBar;
 	public Text loadingText;
 	public SpriteRenderer loadingBlank;
@@ -50,32 +51,45 @@ public class LoadingControl : MonoBehaviour
         StartCoroutine(DelayToChangeText(text, target, duration / 2));
     }
 
-	public void Load(int num, float delay = 1f, bool fade = true)
-	{
+    public void Load(int num, float delay = 0.25f, bool fade = true)
+    {
         if (fade)
         {
             FadeOut(delay);
         }
 
-		StartCoroutine(LoadLevelWithDelay(num, delay));
+        if (loadWithProgress)
+        {
+            LoadWithProgress(num, delay);
+        }
+        else
+        {
+            LoadWithoutProgress(num, delay);         
+        }
 	}
 
-	public void LoadWithProgress(int num, float delay = 1f)
-	{
-		FadeOut(delay);
+    public void LoadWithoutProgress(int num, float delay = 1f)
+    {
+        StartCoroutine(LoadLevelWithDelay(num, delay));
+    }
 
-		//loadingBar.gameObject.SetActive(true);
-		loadingText.gameObject.SetActive(true);
-		loadingText.text = "Loading...";
+    public void LoadWithProgress(int num, float delay = 1f)
+	{
+        //loadingBar.gameObject.SetActive(true);
+
         //loadingText.DOFade(0f, 0f);
         //loadingText.DOFade(1f, 1f);
 
         StartCoroutine(LoadLevelWithRealProgress(num, delay));
 	}
 
+    public void Quit()
+    {
+        Application.Quit();
+    }
+
     IEnumerator DelayToChangeText(Text text, string target, float delay = 1f)
     {
-        
         yield return new WaitForSeconds(delay);
 
         text.text = target;
@@ -92,7 +106,10 @@ public class LoadingControl : MonoBehaviour
 	{
 		yield return new WaitForSeconds(delay);
 
-		ao = SceneManager.LoadSceneAsync(1);
+        loadingText.gameObject.SetActive(true);
+        loadingText.text = "Loading...";
+
+        ao = SceneManager.LoadSceneAsync(num);
 		ao.allowSceneActivation = false;
 
 		while (!ao.isDone)
@@ -102,11 +119,11 @@ public class LoadingControl : MonoBehaviour
 			if (ao.progress == 0.9f)
 			{
 				loadingBar.value = 1.0f;
-                FadeText(loadingText, "Press 'SPACE' to continue", 1f);
-				if (Input.GetKeyDown("space"))
-				{
+                //FadeText(loadingText, "Press 'SPACE' to continue", 0.25f);
+				//if (Input.GetKeyDown("space"))
+				//{
 					ao.allowSceneActivation = true;
-				}
+				//}
 			}
 
 			//Debug.Log(ao.progress);

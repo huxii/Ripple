@@ -91,7 +91,7 @@ public class MainControl : MonoBehaviour
             //print(Input.GetAxis("Mouse X"));
             if (Mathf.Abs(Input.GetAxis("Mouse X")) > 1.5f || Mathf.Abs(Input.GetAxis("Mouse Y")) > 1.5f)
             {
-                if (stateTimer >= 10)
+                if (stateTimer >= 40)
                 {
                     gameState = GameState.LeftClick;
                     stateTimer = 0;
@@ -144,6 +144,7 @@ public class MainControl : MonoBehaviour
 
                     CreateNewHint();
                     CreateNewInstruction(startPrefab);
+                    bgm.transform.position = new Vector3(1.0f, 1.0f, 1.0f);
                 }
 
                 stateTimer = 0;
@@ -265,6 +266,7 @@ public class MainControl : MonoBehaviour
 
         if (hint)
         {
+            instruction.transform.DOScale(new Vector3(0, 0, 0), 0.2f).SetEase(Ease.OutQuad).SetDelay(1.4f);
             hint.transform.DOScale(new Vector3(0, 0, 0), 0.2f).SetEase(Ease.OutQuad).SetDelay(1.4f)
                 .OnComplete(
                 () => { shewSound.Play(); objects.transform.DOScale(new Vector3(0.0f, 0.0f, 0.0f), 0.4f).SetEase(Ease.OutCubic); }

@@ -22,7 +22,7 @@ public class MenuControl : MonoBehaviour
         }
         else
         {
-            bgm.transform.position = new Vector3(1.0f, 1.0f, 1.0f);
+            //bgm.transform.position = new Vector3(1.0f, 1.0f, 1.0f);
         }
 	}
 	
